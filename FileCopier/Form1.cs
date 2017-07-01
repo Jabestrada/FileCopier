@@ -6,6 +6,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -32,22 +33,12 @@ namespace FileCopier
 
             InitializeComponent();
 
-            _contextMenu = new ContextMenu();
-            _contextMenu.Popup += ContextMenu_Popup;
+            CreateContextMenus();
 
-            _copyTextMenuItem = new MenuItem("Copy");
-            _copyTextMenuItem.Click += copyTextMenuItem_Click;
-
-            _deleteMenuItem = new MenuItem("Delete");
-            _deleteMenuItem.Click += deleteMenuItem_Click;
-
-            _contextMenu.MenuItems.Add(_copyTextMenuItem);
-            _contextMenu.MenuItems.Add(_deleteMenuItem);
-
-            sources.ContextMenu = _contextMenu;
-            targets.ContextMenu = _contextMenu;
+            CheckAdminRights();
         }
 
+     
         #region Event handlers
         private void deleteMenuItem_Click(object sender, EventArgs e)
         {
@@ -123,6 +114,15 @@ namespace FileCopier
 
         #endregion
 
+
+        private void CheckAdminRights()
+        {
+            if (!IsAdministrator())
+            {
+                MessageBox.Show("FileCopier is running WITHOUT admin privileges. Copy operations will fail on target folders that require admin access like \inetpub.");
+            }
+        }
+
         private void LoadSettings()
         {
             var fileDialog = new OpenFileDialog
@@ -180,7 +180,7 @@ namespace FileCopier
 
         private void SerializeToFile(string filename) {
             var sourceItems = GetFilesFromList(sources);
-            var targetItems = GetFilesFromList(targets);
+            var targetItems = _targetList;
             var forSerialization = new FileItemsSerialization
             {
                 Sources = sourceItems,
@@ -207,6 +207,14 @@ namespace FileCopier
             foreach(var item in items)
             {
                 list.Items.Add(item, item.Checked);
+            }
+        }
+
+        private void SetListItems(ListBox list, List<FileListItem> items)
+        {
+            foreach (var item in items)
+            {
+                list.Items.Add(item);
             }
         }
 
@@ -288,18 +296,24 @@ namespace FileCopier
                         SourceFile = sourceItem.Filename
                     };
 
-                    for (var j = 0; j < targets.Items.Count; j++)
-                    {
-                        if (targets.GetItemChecked(j))
-                        {
-                            var targetItem = targets.Items[j] as FileListItem;
-                            if (targetItem != null && targetItem.SourceFile == sourceItem.InternalFilename)
-                            {
-                                itemHasTarget = true;
-                                fileCopyItem.TargetFiles.Add(targetItem.Filename);
-                            }
-                        }
+                    foreach(var targetItem in _targetList
+                                            .Where(t => t.SourceFile == sourceItem.InternalFilename)) {
+                        itemHasTarget = true;
+                        fileCopyItem.TargetFiles.Add(targetItem.Filename);
                     }
+                    //for (var j = 0; j < targets.Items.Count; j++)
+                    //{
+                    //    if (targets.GetItemChecked(j))
+                    //    {
+                    //        var targetItem = targets.Items[j] as FileListItem;
+                    //        if (targetItem != null && targetItem.SourceFile == sourceItem.InternalFilename)
+                    //        {
+                    //            itemHasTarget = true;
+                    //            fileCopyItem.TargetFiles.Add(targetItem.Filename);
+                    //        }
+                    //    }
+                    //}
+                    
                     if (itemHasTarget)
                     {
                         fileCopyOptions.FileCopyItems.Add(fileCopyItem);
@@ -408,7 +422,7 @@ namespace FileCopier
                     };
                     _targetList.Add(newFileItem);
 
-                    var index = targets.Items.Add(newFileItem, true);
+                    var index = targets.Items.Add(newFileItem);
                     targets.SetSelected(index, true);
                     newTarget.Clear();
                     newTarget.Focus();
@@ -426,7 +440,7 @@ namespace FileCopier
 
             targets.Items.Clear();
             foreach (var item in _targetList.Where(f => f.SourceFile == selectedSource.InternalFilename)) {
-                targets.Items.Add(item, item.Checked);
+                targets.Items.Add(item);
             }
         }
 
@@ -469,7 +483,7 @@ namespace FileCopier
             var contextMenu = menuItem.GetContextMenu();
             if (contextMenu == null) return null;
 
-            var sourceList = contextMenu.SourceControl as CheckedListBox;
+            var sourceList = contextMenu.SourceControl as CheckedListBox ?? contextMenu.SourceControl as ListBox;
             if (sourceList != null)
             {
                 return sourceList.SelectedItem as FileListItem;
@@ -510,7 +524,7 @@ namespace FileCopier
             var contextMenu = sender as ContextMenu;
             if (contextMenu == null) return;
 
-            var sourceList = contextMenu.SourceControl as CheckedListBox;
+            var sourceList = contextMenu.SourceControl as CheckedListBox ?? contextMenu.SourceControl as ListBox;
             if (sourceList != null)
             {
                 var selectedItem = sourceList.SelectedItem as FileListItem;
@@ -521,5 +535,31 @@ namespace FileCopier
                 }
             }
         }
+
+        public bool IsAdministrator()
+        {
+            var identity = WindowsIdentity.GetCurrent();
+            var principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        private void CreateContextMenus()
+        {
+            _contextMenu = new ContextMenu();
+            _contextMenu.Popup += ContextMenu_Popup;
+
+            _copyTextMenuItem = new MenuItem("Copy");
+            _copyTextMenuItem.Click += copyTextMenuItem_Click;
+
+            _deleteMenuItem = new MenuItem("Delete");
+            _deleteMenuItem.Click += deleteMenuItem_Click;
+
+            _contextMenu.MenuItems.Add(_copyTextMenuItem);
+            _contextMenu.MenuItems.Add(_deleteMenuItem);
+
+            sources.ContextMenu = _contextMenu;
+            targets.ContextMenu = _contextMenu;
+        }
+
     }
 }
