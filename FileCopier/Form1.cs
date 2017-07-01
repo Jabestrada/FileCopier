@@ -119,7 +119,7 @@ namespace FileCopier
         {
             if (!IsAdministrator())
             {
-                MessageBox.Show("FileCopier is running WITHOUT admin privileges. Copy operations will fail on target folders that require admin access like \inetpub.");
+                MessageBox.Show(@"FileCopier is running WITHOUT admin privileges. Copy operations will fail on target folders that require admin access like \inetpub.");
             }
         }
 
@@ -169,6 +169,9 @@ namespace FileCopier
                     SerializeToFile(filename);
                     _currentConfigFile = filename;
                     RefreshFormTitle();
+                } else
+                {
+                    return;
                 }
             }
             else
