@@ -304,18 +304,6 @@ namespace FileCopier
                         itemHasTarget = true;
                         fileCopyItem.TargetFiles.Add(targetItem.Filename);
                     }
-                    //for (var j = 0; j < targets.Items.Count; j++)
-                    //{
-                    //    if (targets.GetItemChecked(j))
-                    //    {
-                    //        var targetItem = targets.Items[j] as FileListItem;
-                    //        if (targetItem != null && targetItem.SourceFile == sourceItem.InternalFilename)
-                    //        {
-                    //            itemHasTarget = true;
-                    //            fileCopyItem.TargetFiles.Add(targetItem.Filename);
-                    //        }
-                    //    }
-                    //}
                     
                     if (itemHasTarget)
                     {
@@ -357,6 +345,7 @@ namespace FileCopier
             var newSourceFile = newSource.Text.Trim();
             if (string.IsNullOrWhiteSpace(newSourceFile))
             {
+                BrowseSource();
                 return;
             }
             if (!File.Exists(newSourceFile))
@@ -401,6 +390,11 @@ namespace FileCopier
             else
             {
                 var newSourceFile = newTarget.Text.Trim();
+                if (string.IsNullOrWhiteSpace(newSourceFile))
+                {
+                    BrowseTarget();
+                    return;
+                }
                 var newInternalFilename = newSourceFile.ToLowerInvariant();
                 if (newInternalFilename == selectedSource.InternalFilename) {
                     MessageBox.Show("Target file cannot be identical to source file");
@@ -469,6 +463,7 @@ namespace FileCopier
             var fileDialog = new OpenFileDialog
             {
                 CheckPathExists = true,
+                CheckFileExists = false,
                 Multiselect = false
             };
             if (fileDialog.ShowDialog() == DialogResult.OK)
