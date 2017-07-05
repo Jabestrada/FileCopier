@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -318,9 +319,13 @@ namespace FileCopier
             }
 
             var fileCopier = new FileCopier.Lib.FileCopier(fileCopyOptions);
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             var result = await fileCopier.Start();
+            sw.Stop();
             var output = new StringBuilder();
-            foreach(var fileCopyResult in result.Results)
+            output.AppendLine(string.Format("File copy completed in {0} ms on {1}", sw.ElapsedMilliseconds, DateTime.Now));
+            foreach (var fileCopyResult in result.Results)
             {
                 if (fileCopyResult.Succeeded)
                 {
