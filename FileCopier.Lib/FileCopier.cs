@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace FileCopier.Lib
-{
+namespace FileCopier.Lib {
     public class FileCopier
     {
         private FileCopyOption _options;
