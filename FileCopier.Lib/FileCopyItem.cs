@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace FileCopier.Lib
-{
+namespace FileCopier.Lib {
     public class FileCopyItem
     {
         public string SourceFile { get; set; }
