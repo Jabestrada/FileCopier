@@ -297,13 +297,13 @@ namespace FileCopier
 
                     var fileCopyItem = new FileCopyItem
                     {
-                        SourceFile = sourceItem.Filename
+                        SourceFile = sourceItem.FileName
                     };
 
                     foreach(var targetItem in _targetList
                                             .Where(t => t.SourceFile == sourceItem.InternalFilename)) {
                         itemHasTarget = true;
-                        fileCopyItem.TargetFiles.Add(targetItem.Filename);
+                        fileCopyItem.TargetFiles.Add(targetItem.FileName);
                     }
                     
                     if (itemHasTarget)
@@ -370,7 +370,7 @@ namespace FileCopier
                 var newFileItem = new FileListItem
                 {
                     InternalFilename = newInternalFilename,
-                    Filename = newSourceFile,
+                    FileName = newSourceFile,
                     SourceFile = string.Empty,
                     Checked = true
                 };
@@ -410,7 +410,7 @@ namespace FileCopier
                         f.InternalFilename == newInternalFilename))
                 {
                     MessageBox.Show(string.Format("Target {0} already exists for source {1}.",
-                                            newSourceFile, selectedSource.Filename));
+                                            newSourceFile, selectedSource.FileName));
                     return;
                 }
                 else
@@ -418,7 +418,7 @@ namespace FileCopier
                     var newFileItem = new FileListItem
                     {
                         InternalFilename = newInternalFilename,
-                        Filename = newSourceFile,
+                        FileName = newSourceFile,
                         SourceFile = selectedSource.InternalFilename,
                         Checked = true
                     };
@@ -515,7 +515,7 @@ namespace FileCopier
             var filelistItem = GetFileItemFromContextMenuItem(sender);
             if (filelistItem != null)
             {
-                Clipboard.SetText(filelistItem.Filename);
+                Clipboard.SetText(filelistItem.FileName);
             }
         }
 
