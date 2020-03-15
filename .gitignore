@@ -1,1 +1,5 @@
 .vs/
+FileCopier.Lib/bin/
+FileCopier.Lib/obj/
+FileCopier/bin/
+FileCopier/obj/
