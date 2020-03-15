@@ -250,8 +250,8 @@ namespace FileCopier
             }
 
             
-            var itemToDelete = _targetList.FirstOrDefault(f => f.InternalFilename == selectedTarget.InternalFilename &&
-                                                            f.SourceFile == selectedSource.InternalFilename);
+            var itemToDelete = _targetList.FirstOrDefault(f => f.InternalFileName == selectedTarget.InternalFileName &&
+                                                            f.SourceFile == selectedSource.InternalFileName);
             if (itemToDelete != null)
             {
                 _targetList.Remove(itemToDelete);
@@ -268,13 +268,13 @@ namespace FileCopier
                 return;
             }
 
-            var sourceItemToDelete = _sourceList.FirstOrDefault(f => f.InternalFilename == selectedSource.InternalFilename);
+            var sourceItemToDelete = _sourceList.FirstOrDefault(f => f.InternalFileName == selectedSource.InternalFileName);
             if (sourceItemToDelete == null)
             {
                 return;
             }
 
-            _targetList.RemoveAll(f => f.SourceFile == selectedSource.InternalFilename);
+            _targetList.RemoveAll(f => f.SourceFile == selectedSource.InternalFileName);
             FilterTargetList();
             sources.Items.Remove(selectedSource);
             _sourceList.Remove(sourceItemToDelete);
@@ -301,7 +301,7 @@ namespace FileCopier
                     };
 
                     foreach(var targetItem in _targetList
-                                            .Where(t => t.SourceFile == sourceItem.InternalFilename)) {
+                                            .Where(t => t.SourceFile == sourceItem.InternalFileName)) {
                         itemHasTarget = true;
                         fileCopyItem.TargetFiles.Add(targetItem.FileName);
                     }
@@ -360,7 +360,7 @@ namespace FileCopier
             }
             var newInternalFilename = newSourceFile.ToLowerInvariant();
 
-            if (_sourceList.Any(f => f.InternalFilename == newInternalFilename))
+            if (_sourceList.Any(f => f.InternalFileName == newInternalFilename))
             {
                 MessageBox.Show(string.Format("Source {0} already exists.", newSourceFile));
                 return;
@@ -369,7 +369,7 @@ namespace FileCopier
             {
                 var newFileItem = new FileListItem
                 {
-                    InternalFilename = newInternalFilename,
+                    InternalFileName = newInternalFilename,
                     FileName = newSourceFile,
                     SourceFile = string.Empty,
                     Checked = true
@@ -401,13 +401,13 @@ namespace FileCopier
                     return;
                 }
                 var newInternalFilename = newSourceFile.ToLowerInvariant();
-                if (newInternalFilename == selectedSource.InternalFilename) {
+                if (newInternalFilename == selectedSource.InternalFileName) {
                     MessageBox.Show("Target file cannot be identical to source file");
                     return;
                 }
 
-                if (_targetList.Any(f => f.SourceFile == selectedSource.InternalFilename &&
-                        f.InternalFilename == newInternalFilename))
+                if (_targetList.Any(f => f.SourceFile == selectedSource.InternalFileName &&
+                        f.InternalFileName == newInternalFilename))
                 {
                     MessageBox.Show(string.Format("Target {0} already exists for source {1}.",
                                             newSourceFile, selectedSource.FileName));
@@ -417,9 +417,9 @@ namespace FileCopier
                 {
                     var newFileItem = new FileListItem
                     {
-                        InternalFilename = newInternalFilename,
+                        InternalFileName = newInternalFilename,
                         FileName = newSourceFile,
-                        SourceFile = selectedSource.InternalFilename,
+                        SourceFile = selectedSource.InternalFileName,
                         Checked = true
                     };
                     _targetList.Add(newFileItem);
@@ -441,7 +441,7 @@ namespace FileCopier
             }
 
             targets.Items.Clear();
-            foreach (var item in _targetList.Where(f => f.SourceFile == selectedSource.InternalFilename)) {
+            foreach (var item in _targetList.Where(f => f.SourceFile == selectedSource.InternalFileName)) {
                 targets.Items.Add(item);
             }
         }
